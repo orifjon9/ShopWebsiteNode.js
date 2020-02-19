@@ -1,1 +1,1 @@
-module.exports = ['Banana', 'Apple'];
+module.exports = [{ title: 'Banana' }, { title: 'Apple' }];
