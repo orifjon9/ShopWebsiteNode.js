@@ -6,12 +6,12 @@ const router = express.Router();
 
 
 router.get('/products/add', (req, res, next) => {
-    res.sendFile(path('views', 'products', 'add.html'));
+    res.render('products/add', {pageTitle: 'Add Product'})
 });
 
 router.post('/products', (req, res, next) => {
     products.push({ title: req.body.title });
-    res.redirect('/products');
+    res.redirect('/');
 });
 
 module.exports = router;
