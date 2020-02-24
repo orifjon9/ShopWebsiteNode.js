@@ -6,7 +6,11 @@ const router = express.Router();
 
 
 router.get('/', (req, res, next) => {
-    res.render('shop', { prods: products, pageTitle: 'Shop' });
+    res.render('shop', { 
+        prods: products, 
+        pageTitle: 'Shop',
+        hasProducts: products.length > 0 
+    });
 });
 
 module.exports = router;
