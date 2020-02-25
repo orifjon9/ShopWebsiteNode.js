@@ -6,10 +6,11 @@ const router = express.Router();
 
 
 router.get('/', (req, res, next) => {
-    res.render('shop', { 
-        prods: products, 
+    res.render('shop', {
+        prods: products,
         pageTitle: 'Shop',
-        hasProducts: products.length > 0 
+        hasProducts: products.length > 0,
+        path: 'shop'
     });
 });
 
