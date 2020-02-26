@@ -7,18 +7,7 @@ const path = require('./util/path');
 const app = express();
 
 // set template engine
-//app.set('view engine', 'pug');
-
 app.set('view engine', 'ejs');
-
-// app.engine('hbs', expressHbs(
-//     {
-//         layoutsDir: 'views/layouts/', 
-//         defaultLayout: 'main-layout',
-//         extname: 'hbs'
-//     }));
-// app.set('view engine', 'hbs');
-
 // by default, it is 'views'. You can change if you want
 //app.set('views', 'views');
 
