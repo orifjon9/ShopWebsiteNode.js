@@ -1,1 +1,0 @@
-module.exports = [{ title: 'Great Book' }, { title: 'Think slow and faster' }];
