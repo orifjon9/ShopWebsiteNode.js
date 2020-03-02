@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/orifjon9/BasicsNode.js.git"
+    "url": "git+https://github.com/orifjon9/ShopWebsiteNode.js.git"
   },
   "author": "Orifjon Narkulov",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/orifjon9/BasicsNode.js/issues"
+    "url": "https://github.com/orifjon9/ShopWebsiteNode.js/issues"
   },
-  "homepage": "https://github.com/orifjon9/BasicsNode.js#readme",
+  "homepage": "https://github.com/orifjon9/ShopWebsiteNode.js#readme",
   "devDependencies": {
     "nodemon": "^2.0.2"
   },
