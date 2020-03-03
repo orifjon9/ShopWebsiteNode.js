@@ -20,6 +20,22 @@ exports.getIndex = (req, res, next) => {
     });
 };
 
+exports.getProduct = (req, res, next) => {
+    const id = +req.params.productId;
+
+    Product.getById(id, product => {
+        if (product) {
+            res.render('shop/products/details', {
+                product: product,
+                pageTitle: `${product.title} | Product`,
+                path: 'product-details'
+            });
+        } else {
+            res.redirect('/404');
+        }
+    });
+};
+
 exports.getCart = (req, res, next) => {
     res.render('shop/cart', {
         pageTitle: 'Your Cart',

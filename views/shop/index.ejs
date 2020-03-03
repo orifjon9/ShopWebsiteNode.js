@@ -5,7 +5,6 @@
 
 <main>
     <% if(prods.length > 0) { %>
-    <h1>Shop</h1>
     <div class="grid">
         <% for(let product of prods) { %>
         <article class="card product-item">
@@ -22,7 +21,7 @@
                 </p>
             </div>
             <div class="card__actions">
-                <form action="/add-to-cart" method="POST">
+                <form action="/cart" method="POST">
                     <button class="btn">Add to Cart</button>
                 </form>
             </div>

@@ -5,7 +5,6 @@
 
 <main>
     <% if(prods.length > 0) { %>
-    <h1>Shop</h1>
     <div class="grid">
         <% for(let product of prods) { %>
         <article class="card product-item">
@@ -21,6 +20,7 @@
                 </p>
             </div>
             <div class="card__actions">
+                <a href="/products/<%=product.id%>" class="btn">Details</a>
                 <button class="btn">Add to Cart</button>
             </div>
         </article>

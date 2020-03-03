@@ -22,15 +22,25 @@ module.exports = class Product {
 
     save = () => {
         getProductsFromFile(products => {
+            this.id = this.getNextId(products);
             products.push(this);
-            
             fs.writeFile(p, JSON.stringify(products), err => {
                 console.log(err);
             });
         });
     }
 
+    getNextId = products => Math.max.apply(Math, products.map(p => p.id)) + 1;
+
     static fetchAll = (callback) => {
         getProductsFromFile(callback);
     }
+
+    static getById = (id, callback) => {
+        getProductsFromFile(products => {
+            const product = products.find(p => p.id === id);
+            console.log(product);
+            callback(product);
+        });
+    };
 }
