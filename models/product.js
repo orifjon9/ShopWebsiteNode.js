@@ -6,7 +6,7 @@ const p = path('data', 'products.json');
 const getProductsFromFile = callback => {
     fs.readFile(p, (err, fileContent) => {
         if (!err) {
-            return callback(JSON.parse(new Buffer(fileContent).toString()));
+            return callback(JSON.parse(fileContent));
         }
         callback([]);
     });
@@ -39,7 +39,6 @@ module.exports = class Product {
     static getById = (id, callback) => {
         getProductsFromFile(products => {
             const product = products.find(p => p.id === id);
-            console.log(product);
             callback(product);
         });
     };
