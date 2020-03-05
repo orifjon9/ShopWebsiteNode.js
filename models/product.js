@@ -30,6 +30,19 @@ module.exports = class Product {
         });
     }
 
+    update = () => {
+        getProductsFromFile(products => {
+            const productIndex = products.findIndex(p => p.id === this.id);
+            
+            if(productIndex > -1){
+                let updatedProducts = [...products, {...this}];
+                fs.writeFile(p, JSON.stringify(updatedProducts), err => {
+                    console.log(err);
+                });
+            }
+        });
+    }
+
     getNextId = products => Math.max.apply(Math, products.map(p => p.id)) + 1;
 
     static fetchAll = (callback) => {
@@ -38,7 +51,7 @@ module.exports = class Product {
 
     static getById = (id, callback) => {
         getProductsFromFile(products => {
-            const product = products.find(p => p.id === id);
+            const product = products.find(p => p.id === +id);
             callback(product);
         });
     };

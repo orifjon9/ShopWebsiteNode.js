@@ -48,7 +48,6 @@ exports.postCart = (req, res, next) => {
     const productId = req.body.productId;
     console.log(productId);
     Product.getById(+productId, prod => {
-        console.log(prod);
         Cart.addProduct(productId, prod.price);
     });
 
