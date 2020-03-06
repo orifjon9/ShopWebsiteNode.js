@@ -33,9 +33,10 @@ module.exports = class Product {
     update = () => {
         getProductsFromFile(products => {
             const productIndex = products.findIndex(p => p.id === this.id);
-            
+            console.log(productIndex);
             if(productIndex > -1){
-                let updatedProducts = [...products, {...this}];
+                let updatedProducts = [...products];
+                updatedProducts[productIndex] = this;
                 fs.writeFile(p, JSON.stringify(updatedProducts), err => {
                     console.log(err);
                 });

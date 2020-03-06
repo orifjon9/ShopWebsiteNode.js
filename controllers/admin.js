@@ -42,11 +42,14 @@ exports.postProduct = (req, res, next) => {
 };
 
 exports.putProduct = (req, res, next) => {
+    console.log('Update product');
     const { title, imageUrl, price, description } = req.body;
     let product = new Product(title, imageUrl, price, description);
     product.id = +req.params.productId;
 
     product.update();
+
+    res.redirect(`/admin/products`);
 };
 
 const redirectToPageNotFound = (res) => res.redirect('/404');

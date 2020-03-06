@@ -5,7 +5,7 @@
 <%- include('../../includes/navigation.ejs')%>
 
 <main>
-    <form class="product-form" action="/admin/products/<%=product.id%>" _method="PUT" method="POST" >
+    <form class="product-form" action="/admin/products/<%=product.id%>?_method=PUT" method="POST" >
         <div class="form-control">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" value="<%=product.title%>" />
