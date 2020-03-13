@@ -3,7 +3,22 @@
 <%- include('../includes/navigation.ejs')%>
 
 <main>
-    <h1>My Cart</h1>
+    <% if(products.length > 0) {%>
+    <ul>
+        <% products.forEach(product => { %>
+        <li>
+            <p>
+                <%=product.title %> (<%=product.quantity%>)
+            </p>
+            <form action="/cart/<%=product.id%>?_method=DELETE" method="POST">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+        <% })%>
+    </ul>
+    <% } else { %>
+    <h2>Cart is empty.</h2>
+    <% } %>
 </main>
 
 <%- include('../includes/end.ejs') %>

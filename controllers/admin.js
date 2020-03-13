@@ -42,13 +42,18 @@ exports.postProduct = (req, res, next) => {
 };
 
 exports.putProduct = (req, res, next) => {
-    console.log('Update product');
     const { title, imageUrl, price, description } = req.body;
     let product = new Product(title, imageUrl, price, description);
     product.id = +req.params.productId;
 
     product.update();
+    res.redirect(`/admin/products`);
+};
 
+exports.deleteProduct = (req, res, next) => {
+    const id = +req.params.productId;
+
+    Product.deleteById(id);
     res.redirect(`/admin/products`);
 };
 
