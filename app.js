@@ -5,6 +5,7 @@ const methodOverride = require('method-override');
 
 const path = require('./util/path');
 const errorController = require('./controllers/error');
+const dbContext = require('./util/db-context');
 
 const app = express();
 
@@ -24,8 +25,13 @@ app.use(express.static(path('public')));
 app.use('/admin', adminRouters);
 app.use(shopRouters);
 
-//app.use(errorController.get404)
+dbContext
+    .sync()
+    .then(() => {
+        app.listen(3000, () => {
+            console.log('http://localhost:3000 started');
+        })
+    })
+    .catch(err => console.log(err));
 
-app.listen(3000, () => {
-    console.log('http://localhost:3000 started');
-})
+
