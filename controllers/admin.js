@@ -1,13 +1,15 @@
+const { DataTypes, Sequelize } = require('sequelize');
 const Product = require('../models/product');
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
-        res.render('admin/products/list', {
-            prods: products,
-            pageTitle: 'Admin Products',
-            path: 'admin-products'
+    Product.findAll()
+        .then(products => {
+            res.render('admin/products/list', {
+                prods: products,
+                pageTitle: 'Admin Products',
+                path: 'admin-products'
+            });
         });
-    });
 };
 
 exports.getAddProduct = (req, res, next) => {
@@ -17,17 +19,16 @@ exports.getAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
     const productId = req.params.productId;
     if (productId) {
-        Product.getById(productId, product => {
-            if (product) {
+        Product.findByPk(productId)
+            .then(product => {
                 res.render('admin/products/edit', {
                     pageTitle: 'Update Product',
                     path: 'add-product',
                     product: product
                 });
-            } else {
+            }).catch(err => {
                 redirectToPageNotFound(res);
-            }
-        });
+            });
     } else {
         redirectToPageNotFound(res);
     }
@@ -35,26 +36,39 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    const product = new Product(title, imageUrl, price, description);
-    product.save();
-
-    res.redirect('/');
+    Product.create({
+        title: title,
+        description: description,
+        price: price,
+        imageUrl: imageUrl
+    }).then(() => {
+        res.redirect('/');
+    }).catch(err => console.log(err));
 };
 
 exports.putProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    let product = new Product(title, imageUrl, price, description);
-    product.id = +req.params.productId;
+    const productId = +req.params.productId;
 
-    product.update();
-    res.redirect(`/admin/products`);
+    Product.update({
+        title: title,
+        description: description,
+        price: price,
+        imageUrl: imageUrl
+    }, { where: { id: productId } }
+    ).then(() => {
+        res.redirect(`/admin/products`);
+    }).catch(err => console.log(err));
 };
 
 exports.deleteProduct = (req, res, next) => {
     const id = +req.params.productId;
-
-    Product.deleteById(id);
-    res.redirect(`/admin/products`);
+    Product.findByPk(id)
+        .then(product => product.destroy())
+        .then(() => {
+            res.redirect(`/admin/products`);
+        })
+        .catch(err => console.log(err));
 };
 
 const redirectToPageNotFound = (res) => res.redirect('/404');
