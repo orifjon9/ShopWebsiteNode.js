@@ -2,13 +2,14 @@ const { DataTypes } = require('sequelize');
 
 const dbContext = require('../util/db-context');
 
-const Cart = dbContext.define('cart', {
+const CartItem = dbContext.define('cartItem', {
     id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
-    }
+    },
+    quantity: DataTypes.INTEGER
 });
 
-module.exports = Cart;
+module.exports = CartItem;

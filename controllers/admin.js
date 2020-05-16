@@ -2,7 +2,9 @@ const { DataTypes, Sequelize } = require('sequelize');
 const Product = require('../models/product');
 
 exports.getProducts = (req, res, next) => {
-    Product.findAll()
+    //Product.findAll()
+    req.user
+        .getProducts()
         .then(products => {
             res.render('admin/products/list', {
                 prods: products,
@@ -19,8 +21,11 @@ exports.getAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
     const productId = req.params.productId;
     if (productId) {
-        Product.findByPk(productId)
-            .then(product => {
+        //Product.findByPk(productId)
+        req.user
+            .getProducts({ where: { id: productId } })
+            .then(products => {
+                const product = products[0];
                 res.render('admin/products/edit', {
                     pageTitle: 'Update Product',
                     path: 'add-product',
@@ -36,14 +41,16 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    Product.create({
-        title: title,
-        description: description,
-        price: price,
-        imageUrl: imageUrl
-    }).then(() => {
-        res.redirect('/');
-    }).catch(err => console.log(err));
+    console.log(req.user);
+    req.user
+        .createProduct({
+            title: title,
+            description: description,
+            price: price,
+            imageUrl: imageUrl
+        }).then(() => {
+            res.redirect('/');
+        }).catch(err => console.log(err));
 };
 
 exports.putProduct = (req, res, next) => {
