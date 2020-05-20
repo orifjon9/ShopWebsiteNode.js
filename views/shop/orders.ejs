@@ -3,6 +3,20 @@
 <%- include('../includes/navigation.ejs')%>
 
 <main>
+    <% if(orders.length > 0) {%>
+    <% orders.forEach(order => {%>
+    <ul>
+        # <%=order.id %>
+        <ul>
+            <% order.products.forEach(product => {%>
+                    <li> <%=product.title%> (<%=product.orderItem.quantity %>)</li>
+                <%})%>
+            </ul>
+            </ul>
+        <%})%>
+            <% } else {%>
+            <h1>No Orders</h1>
+            <% }%>
 </main>
 
 <%- include('../includes/end.ejs') %>
