@@ -1,4 +1,4 @@
-const Product = require('../models/product');
+const { Product } = require('../models/sequelize/index');
 const Cart = require('../models/cart-old');
 
 exports.getProducts = (req, res, next) => {

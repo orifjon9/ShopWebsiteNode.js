@@ -1,5 +1,5 @@
 const { DataTypes, Sequelize } = require('sequelize');
-const Product = require('../models/product');
+const { Product } = require('../models/sequelize/index');
 
 exports.getProducts = (req, res, next) => {
     //Product.findAll()
