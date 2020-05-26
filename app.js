@@ -7,6 +7,8 @@ const path = require('./util/path');
 const errorController = require('./controllers/error');
 const { connect, adminUserId, User } = require('./models/sequelize/index');
 
+const { mongoDBConnect } = require('./util/mongoDB');
+
 const app = express();
 
 // set template engine
@@ -22,24 +24,32 @@ const shopRouters = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path('public')));
 
-app.use((req, res, next) => {
-    User.findByPk(adminUserId)
-        .then(user => {
-            req.user = user;
-            next();
-        })
-        .catch(err => console.log(err));
-});
+// app.use((req, res, next) => {
+//     User.findByPk(adminUserId)
+//         .then(user => {
+//             req.user = user;
+//             next();
+//         })
+//         .catch(err => console.log(err));
+// });
 
 app.use('/admin', adminRouters);
 app.use(shopRouters);
 
 
-connect()
+// connect()
+//     .then(() => {
+//         app.listen(3000, () => {
+//             console.log('http://localhost:3000 started');
+//         })
+//     })
+//     .catch(err => console.log(err));
+
+mongoDBConnect()
     .then(() => {
         app.listen(3000, () => {
             console.log('http://localhost:3000 started');
-        })
+        });
     })
     .catch(err => console.log(err));
 
