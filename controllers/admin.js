@@ -40,7 +40,9 @@ exports.postProduct = (req, res, next) => {
         title,
         description,
         price,
-        imageUrl
+        imageUrl,
+        null,
+        req.user.id
     )
         .save()
         .then(() => {
@@ -57,7 +59,8 @@ exports.putProduct = (req, res, next) => {
         description,
         price,
         imageUrl,
-        productId
+        productId,
+        req.user.id
     )
         .save().then(() => {
             res.redirect(`/admin/products`);

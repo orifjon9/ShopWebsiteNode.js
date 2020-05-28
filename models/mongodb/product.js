@@ -4,12 +4,13 @@ const { getDatabase } = require('../../util/mongoDB');
 
 
 class Product {
-    constructor(title, description, price, imageUrl, id) {
+    constructor(title, description, price, imageUrl, id, userId) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
         this.id = id;
+        this.userId = userId;
     }
 
     save() {
@@ -29,7 +30,13 @@ class Product {
                 .catch(err => console.log(err));
         } else {
             return db.collection('products')
-                .insertOne(this)
+                .insertOne({
+                    title: this.title,
+                    description: this.description,
+                    price: this.price,
+                    imageUrl: this.imageUrl,
+                    userId: this.userId
+                })
                 .then(result => console.log(result))
                 .catch(err => console.log(err));
         }
