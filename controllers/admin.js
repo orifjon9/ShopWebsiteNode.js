@@ -2,7 +2,7 @@ const Product = require('../models/mongodb/product');
 
 exports.getProducts = (req, res, next) => {
     Product
-        .fetchAll()
+        .find()
         .then(products => {
             res.render('admin/products/list', {
                 prods: products,
@@ -19,7 +19,7 @@ exports.getAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
     const productId = req.params.productId;
     if (productId) {
-        Product.getProductById(productId)
+        Product.findById(productId)
             .then(product => {
                 res.render('admin/products/edit', {
                     pageTitle: 'Update Product',
@@ -36,14 +36,15 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    new Product(
-        title,
-        description,
-        price,
-        imageUrl,
-        null,
-        req.user.id
-    )
+    const product = new Product(
+        {
+            title: title,
+            description: description,
+            price: price,
+            imageUrl: imageUrl
+        }
+    );
+    product
         .save()
         .then(() => {
             res.redirect('/');
@@ -54,22 +55,19 @@ exports.putProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
     const productId = req.params.productId;
 
-    new Product(
-        title,
-        description,
-        price,
-        imageUrl,
-        productId,
-        req.user.id
-    )
-        .save().then(() => {
-            res.redirect(`/admin/products`);
-        }).catch(err => console.log(err));
+    Product.findByIdAndUpdate(productId, {
+        title: title,
+        description: description,
+        price: price,
+        imageUrl: imageUrl
+    }).then(() => {
+        res.redirect(`/admin/products`);
+    }).catch(err => console.log(err));
 };
 
 exports.deleteProduct = (req, res, next) => {
     const id = req.params.productId;
-    Product.deleteById(id)
+    Product.findByIdAndRemove(id)
         .then(() => {
             res.redirect(`/admin/products`);
         })

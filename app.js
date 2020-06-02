@@ -25,15 +25,14 @@ const shopRouters = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path('public')));
 
-app.use((req, res, next) => {
-    User.findFirst()
-        .then(user => {
-            req.user = user;
-            console.log(user);
-            next();
-        })
-        .catch(err => console.log(err));
-});
+// app.use((req, res, next) => {
+//     User.findFirst()
+//         .then(user => {
+//             req.user = user;
+//             next();
+//         })
+//         .catch(err => console.log(err));
+// });
 
 app.use('/admin', adminRouters);
 app.use(shopRouters);

@@ -41,7 +41,6 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    console.log(req.user);
     req.user
         .createProduct({
             title: title,
