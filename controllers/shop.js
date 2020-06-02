@@ -1,5 +1,6 @@
 const Product = require('../models/mongodb/product');
-const Cart = require('../models/cart-old');
+const Order = require('../models/mongodb/order');
+const User = require('../models/mongodb/user');
 
 exports.getProducts = (req, res, next) => {
     Product.find()
@@ -39,12 +40,14 @@ exports.getProduct = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
     req.user
-        .getCartProducts()
-        .then(products => {
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user => {
+            console.log(user.cart.items);
             res.render('shop/cart', {
                 pageTitle: 'Your Cart',
                 path: 'cart',
-                products: products
+                items: user.cart.items
             });
 
         })
@@ -53,8 +56,6 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
     const productId = req.body.productId;
-    // let fetchedCart;
-    // let newQuantity = 1;
 
     req.user
         .addProductToCart(productId)
@@ -76,9 +77,11 @@ exports.deleteCart = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-    req.user
-        .getOrders()
+    Order
+        .find({ 'user.id': req.user._id })
+        .populate('products.product')
         .then(orders => {
+            console.log(orders);
             return res.render('shop/orders', {
                 pageTitle: 'Your Orders',
                 path: 'orders',
@@ -89,8 +92,24 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.createOrder = (req, res, next) => {
-    req.user
-        .addOrder()
+
+    var products = req.user.cart.items.map(i => {
+        return {
+            quantity: i.quantity,
+            product: i.productId
+        };
+    })
+
+    Order.create({
+        products: products,
+        user: {
+            name: req.user.username,
+            id: req.user._id
+        }
+    })
+        .then(() => {
+            return req.user.clearCart();
+        })
         .then(() => {
             res.redirect('/orders');
         })

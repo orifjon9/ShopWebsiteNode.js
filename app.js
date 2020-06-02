@@ -8,7 +8,7 @@ const errorController = require('./controllers/error');
 //const { connect, adminUserId, User } = require('./models/sequelize/index');
 
 const { mongoDBConnect } = require('./util/mongoDB');
-const { User } = require('./models/mongodb/user');
+const User = require('./models/mongodb/user');
 
 const app = express();
 
@@ -25,14 +25,30 @@ const shopRouters = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path('public')));
 
-// app.use((req, res, next) => {
-//     User.findFirst()
-//         .then(user => {
-//             req.user = user;
-//             next();
-//         })
-//         .catch(err => console.log(err));
-// });
+app.use((req, res, next) => {
+    User.findOne()
+        .then(user => {
+            if (!user) {
+                return User.create({
+                    username: 'Orifjon',
+                    email: 'info@orifjon.net',
+                    cart: {
+                        items: []
+                    }
+                })
+                    .then(createdUser => {
+                        return createdUser;
+                    });
+            }
+
+            return user;
+        })
+        .then(user => {
+            req.user = user;
+            next();
+        })
+        .catch(err => console.log(err));
+});
 
 app.use('/admin', adminRouters);
 app.use(shopRouters);

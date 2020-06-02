@@ -21,6 +21,11 @@ const productSchema = new Schema({
     imageUrl: {
         type: String,
         required: true
+    },
+    userId: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'User', // named module,
+        required: true
     }
 });
 
