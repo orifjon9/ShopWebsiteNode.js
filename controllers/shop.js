@@ -8,7 +8,8 @@ exports.getProducts = (req, res, next) => {
             res.render('shop/products/list', {
                 prods: products,
                 pageTitle: 'Shop products',
-                path: 'shop-products'
+                path: 'shop-products',
+                isAuthenticated: req.isAuthenticated
             });
         });
 };
@@ -19,7 +20,8 @@ exports.getIndex = (req, res, next) => {
             res.render('shop/index', {
                 prods: products,
                 pageTitle: 'Shop',
-                path: 'shop'
+                path: 'shop',
+                isAuthenticated: req.isAuthenticated
             });
         });
 };
@@ -31,7 +33,8 @@ exports.getProduct = (req, res, next) => {
             res.render('shop/products/details', {
                 product: product,
                 pageTitle: `${product.title} | Product`,
-                path: 'product-details'
+                path: 'product-details',
+                isAuthenticated: req.isAuthenticated
             });
         }).catch(err => {
             res.redirect('/404');
@@ -47,7 +50,8 @@ exports.getCart = (req, res, next) => {
             res.render('shop/cart', {
                 pageTitle: 'Your Cart',
                 path: 'cart',
-                items: user.cart.items
+                items: user.cart.items,
+                isAuthenticated: req.isAuthenticated
             });
 
         })
@@ -81,11 +85,11 @@ exports.getOrders = (req, res, next) => {
         .find({ 'user.id': req.user._id })
         .populate('products.product')
         .then(orders => {
-            console.log(orders);
             return res.render('shop/orders', {
                 pageTitle: 'Your Orders',
                 path: 'orders',
-                orders: orders
+                orders: orders,
+                isAuthenticated: req.isAuthenticated
             });
         })
         .catch(err => console.log(err));
@@ -119,7 +123,8 @@ exports.createOrder = (req, res, next) => {
 exports.getCheckout = (req, res, next) => {
     res.render('shop/checkout', {
         pageTitle: 'Checkout',
-        path: 'checkout'
+        path: 'checkout',
+        isAuthenticated: req.isAuthenticated
     });
 };
 

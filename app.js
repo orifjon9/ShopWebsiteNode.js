@@ -21,6 +21,7 @@ app.use(methodOverride('_method'));
 
 const adminRouters = require('./routes/admin');
 const shopRouters = require('./routes/shop');
+const authRouters = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path('public')));
@@ -52,6 +53,7 @@ app.use((req, res, next) => {
 
 app.use('/admin', adminRouters);
 app.use(shopRouters);
+app.use(authRouters);
 
 
 // connect()
