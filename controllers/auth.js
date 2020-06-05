@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/mongodb/user');
 
 module.exports.getLogin = (req, res, next) => {
@@ -8,35 +10,36 @@ module.exports.getLogin = (req, res, next) => {
     })
 };
 
+module.exports.getSignup = (req, res, next) => {
+    res.render('auth/signup', {
+        pageTitle: 'Signup',
+        path: 'signup',
+        isAuthenticated: false
+    })
+};
+
+
 module.exports.postLogin = (req, res, next) => {
-    User.findOne()
+    const { email, password } = req.body;
+    let fetchedUser;
+
+    User.findOne({ email: email })
         .then(user => {
             if (!user) {
-                return User.create({
-                    username: 'Orifjon',
-                    email: 'info@orifjon.net',
-                    cart: {
-                        items: []
-                    }
-                })
-                    .then(createdUser => {
-                        return createdUser;
-                    });
+                res.redirect('/login');
+            }
+            fetchedUser = user;
+            return bcrypt.compare(password, user.password);
+        })
+        .then(success => {
+            console.log(success);
+            if (success === false) {
+                return res.redirect('/login');
             }
 
-            return user;
-        })
-        .then(user => {
-            req.session.user = user;
-            req.session.isLoggedIn = true;
-            req.session.save(err => {
-                console.log(err);
-                res.redirect('/');
-            });
+            return registerUserInSession(req, res, fetchedUser);
         })
         .catch(err => console.log(err));
-
-
 };
 
 module.exports.postLogout = (req, res, next) => {
@@ -45,3 +48,36 @@ module.exports.postLogout = (req, res, next) => {
         res.redirect('/');
     });
 };
+
+module.exports.postSignup = (req, res, next) => {
+    const { username, email, password } = req.body;
+    User.findOne({ email: email })
+        .then(exsitingUser => {
+            if (exsitingUser) {
+                req.redirect('/signup');
+            }
+            return bcrypt.hash(password, 12)
+                .then(hashPassword => {
+                    return User.create({
+                        email: email,
+                        password: hashPassword,
+                        username: username,
+                        cart: {
+                            items: []
+                        }
+                    });
+                })
+                .then(user => {
+                    return registerUserInSession(req, res, user);
+                });
+        })
+        .catch(err => console.log(err));
+};
+
+const registerUserInSession = (req, res, user) => {
+    req.session.user = user;
+    req.session.isLoggedIn = true;
+    return req.session.save(() => {
+        res.redirect('/');
+    });
+}
