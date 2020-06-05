@@ -3,7 +3,7 @@ const { Product } = require('../models/sequelize/index');
 
 exports.getProducts = (req, res, next) => {
     //Product.findAll()
-    req.user
+     req.session.user
         .getProducts()
         .then(products => {
             res.render('admin/products/list', {
@@ -22,7 +22,7 @@ exports.getEditProduct = (req, res, next) => {
     const productId = req.params.productId;
     if (productId) {
         //Product.findByPk(productId)
-        req.user
+         req.session.user
             .getProducts({ where: { id: productId } })
             .then(products => {
                 const product = products[0];
@@ -41,7 +41,7 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    req.user
+     req.session.user
         .createProduct({
             title: title,
             description: description,

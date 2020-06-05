@@ -1,24 +1,23 @@
 //const mongoDB = require('mongodb');
 const mongoose = require('mongoose');
+const session = require('express-session');
 //const MongoDBClient = mongoDB.MongoClient;
+const mongoDBStoreSession = require('connect-mongodb-session')(session);
+
+const MONGODB_URI = 'mongodb+srv://shop-user:l2aFPmYxLhEjvAFU@cluster-shop-jwc7t.mongodb.net/shop-dev';
 
 let _db;
 
+const sessionStore = new mongoDBStoreSession({
+    uri: MONGODB_URI,
+    collection: 'sessions'
+});
+
 const mongoDBConnect = () => {
     return new Promise((resolve, reject) => {
-        mongoose.connect('mongodb+srv://shop-user:l2aFPmYxLhEjvAFU@cluster-shop-jwc7t.mongodb.net/shop-dev?retryWrites=true&w=majority')
+        mongoose.connect(MONGODB_URI)
             .then(res => resolve(res))
             .catch(err => reject(err));
-        // MongoDBClient.connect('mongodb+srv://shop-user:l2aFPmYxLhEjvAFU@cluster-shop-jwc7t.mongodb.net/shop?retryWrites=true&w=majority')
-        //     .then(client => {
-        //         console.log('Connected!');
-        //         _db = client.db();
-        //         resolve();
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //         reject(err);
-        //     });
     });
 }
 
@@ -30,4 +29,4 @@ const getDatabase = () => {
     throw 'Not database found!';
 }
 
-module.exports = { mongoDBConnect, getDatabase };
+module.exports = { mongoDBConnect, getDatabase, sessionStore };
