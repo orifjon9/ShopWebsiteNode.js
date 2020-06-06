@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const expressHbs = require('express-handlebars');
 const methodOverride = require('method-override');
 const session = require('express-session');
+const csrf = require('csurf');
 
 const path = require('./util/path');
 const errorController = require('./controllers/error');
@@ -24,6 +25,8 @@ const adminRouters = require('./routes/admin');
 const shopRouters = require('./routes/shop');
 const authRouters = require('./routes/auth');
 
+const csrfProtection = csrf();
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path('public')));
 app.use(session({
@@ -32,6 +35,13 @@ app.use(session({
     saveUninitialized: false,
     store: sessionStore
 }));
+
+app.use(csrfProtection);
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.use('/admin', adminRouters);
 app.use(shopRouters);

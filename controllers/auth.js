@@ -32,7 +32,6 @@ module.exports.postLogin = (req, res, next) => {
             return bcrypt.compare(password, user.password);
         })
         .then(success => {
-            console.log(success);
             if (success === false) {
                 return res.redirect('/login');
             }
