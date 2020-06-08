@@ -4,6 +4,7 @@ const expressHbs = require('express-handlebars');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const path = require('./util/path');
 const errorController = require('./controllers/error');
@@ -37,6 +38,8 @@ app.use(session({
 }));
 
 app.use(csrfProtection);
+app.use(flash());
+
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken();
