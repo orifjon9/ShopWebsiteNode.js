@@ -248,6 +248,10 @@ form {
   color: red;
 }
 
+.reset-password-link {
+  margin: 0 0 15px 0;
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

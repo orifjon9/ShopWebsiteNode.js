@@ -50,6 +50,12 @@ app.use('/admin', adminRouters);
 app.use(shopRouters);
 app.use(authRouters);
 
+app.use((req, res, next) => {
+    res.status(404).render('404',{
+        pageTitle: 'Page was not found',
+        path: '404'
+    })
+});
 
 // connect()
 //     .then(() => {

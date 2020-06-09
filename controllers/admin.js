@@ -1,3 +1,5 @@
+const { ObjectId } = require('mongodb');
+
 const Product = require('../models/mongodb/product');
 
 exports.getProducts = (req, res, next) => {
@@ -45,7 +47,7 @@ exports.postProduct = (req, res, next) => {
             description: description,
             price: price,
             imageUrl: imageUrl,
-            userId:  req.session.user
+            userId: req.session.user
         }
     );
     product
@@ -59,20 +61,29 @@ exports.putProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
     const productId = req.params.productId;
 
-    Product.findByIdAndUpdate(productId, {
-        title: title,
-        description: description,
-        price: price,
-        imageUrl: imageUrl,
-        userId:  req.session.user
-    }).then(() => {
-        res.redirect(`/admin/products`);
-    }).catch(err => console.log(err));
+    Product.findOne({ _id: new ObjectId(productId), userId: req.session.user._id })
+        .then(product => {
+            if (product) {
+                product.title = title,
+                    product.description = description,
+                    product.price = price,
+                    product.imageUrl = imageUrl;
+                return product.save();
+            }
+        }
+        ).then(() => {
+            res.redirect(`/admin/products`);
+        }).catch(err => console.log(err));
 };
 
 exports.deleteProduct = (req, res, next) => {
-    const id = req.params.productId;
-    Product.findByIdAndRemove(id)
+    const productId = req.params.productId;
+    Product.findOne({ _id: new ObjectId(productId), userId: req.session.user._id })
+        .then(product => {
+            if(product){
+                product.remove();
+            }
+        })
         .then(() => {
             res.redirect(`/admin/products`);
         })
