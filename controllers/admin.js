@@ -1,4 +1,5 @@
 const { ObjectId } = require('mongodb');
+const { validationResult } = require('express-validator/check');
 
 const Product = require('../models/mongodb/product');
 
@@ -17,8 +18,10 @@ exports.getProducts = (req, res, next) => {
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/products/add', {
         pageTitle: 'Add Product',
-        path: 'add-product'
-    })
+        path: 'add-product',
+        hasError: false,
+        validationErrors: []
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -29,7 +32,9 @@ exports.getEditProduct = (req, res, next) => {
                 res.render('admin/products/edit', {
                     pageTitle: 'Update Product',
                     path: 'add-product',
-                    product: product
+                    product: product,
+                    hasError: false,
+                    validationErrors: []
                 });
             }).catch(err => {
                 redirectToPageNotFound(res);
@@ -50,6 +55,18 @@ exports.postProduct = (req, res, next) => {
             userId: req.session.user
         }
     );
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).render('admin/products/add', {
+            pageTitle: 'Add Product',
+            path: 'add-product',
+            hasError: true,
+            product: product,
+            validationErrors: errors.array()
+        });
+    }
+
     product
         .save()
         .then(() => {
@@ -80,7 +97,7 @@ exports.deleteProduct = (req, res, next) => {
     const productId = req.params.productId;
     Product.findOne({ _id: new ObjectId(productId), userId: req.session.user._id })
         .then(product => {
-            if(product){
+            if (product) {
                 product.remove();
             }
         })
