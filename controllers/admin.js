@@ -71,7 +71,10 @@ exports.postProduct = (req, res, next) => {
         .save()
         .then(() => {
             res.redirect('/');
-        }).catch(err => console.log(err));
+        }).catch(err => {
+            console.log(err);
+            res.redirect('/500');
+        });
 };
 
 exports.putProduct = (req, res, next) => {

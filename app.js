@@ -50,6 +50,13 @@ app.use('/admin', adminRouters);
 app.use(shopRouters);
 app.use(authRouters);
 
+app.use('/500', (req, res, next) => {
+    res.status(500).render('500',{
+        pageTitle: 'Error Page',
+        path: '500'
+    })
+});
+
 app.use((req, res, next) => {
     res.status(404).render('404',{
         pageTitle: 'Page was not found',
