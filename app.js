@@ -5,6 +5,7 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const path = require('./util/path');
 const errorController = require('./controllers/error');
@@ -27,9 +28,29 @@ const shopRouters = require('./routes/shop');
 const authRouters = require('./routes/auth');
 
 const csrfProtection = csrf();
+const fileStorage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        callback(null, 'images');
+    },
+    filename: (req, file, callback) => {
+        callback(null, `${file.fieldname}-${file.originalname}`);
+    }
+});
+
+const fileFilter = (req, file, callback) => {
+    if (file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg' ||
+        file.mimetype === 'image/jpeg') {
+        callback(null, true);
+    } else {
+        callback(null, false);
+    }
+};
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 app.use(express.static(path('public')));
+app.use('/images', express.static(path('images')));
 app.use(session({
     secret: 'my secret',
     resave: false,
@@ -51,14 +72,14 @@ app.use(shopRouters);
 app.use(authRouters);
 
 app.use('/500', (req, res, next) => {
-    res.status(500).render('500',{
+    res.status(500).render('500', {
         pageTitle: 'Error Page',
         path: '500'
     })
 });
 
 app.use((req, res, next) => {
-    res.status(404).render('404',{
+    res.status(404).render('404', {
         pageTitle: 'Page was not found',
         path: '404'
     })
@@ -79,5 +100,4 @@ mongoDBConnect()
         });
     })
     .catch(err => console.log(err));
-
 

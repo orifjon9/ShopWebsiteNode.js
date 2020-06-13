@@ -14,31 +14,23 @@ router.get('/products', isAuth, adminController.getProducts);
 router.post('/products', isAuth,
     [
         body('title', 'Please, enter a valid title')
-            .isAlphanumeric()
             .isLength({ min: 5 })
             .trim(),
-        body('imageUrl', 'Please, enter a valid image URL')
-            .isURL(),
         body('price', 'Please, enter a valid price')
             .isFloat(),
         body('description', 'Please, enter a valid description')
-            .isAlphanumeric()
             .isLength({ min: 20 })
-            .trim(),
+            .trim()
     ],
     adminController.postProduct);
 router.put('/products/:productId', isAuth,
     [
         body('title', 'Please, enter a valid title')
-            .isAlphanumeric()
             .isLength({ min: 5 })
             .trim(),
-        body('imageUrl', 'Please, enter a valid image URL')
-            .isURL(),
         body('price', 'Please, enter a valid price')
             .isFloat(),
         body('description', 'Please, enter a valid description')
-            .isAlphanumeric()
             .isLength({ min: 20 })
             .trim(),
     ], adminController.putProduct);

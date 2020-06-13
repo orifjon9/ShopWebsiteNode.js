@@ -1,6 +1,11 @@
+const fs = require('fs');
+
+const path = require('../util/path');
+
 const Product = require('../models/mongodb/product');
 const Order = require('../models/mongodb/order');
 const User = require('../models/mongodb/user');
+
 
 exports.getProducts = (req, res, next) => {
     Product.find()
@@ -96,27 +101,29 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.createOrder = (req, res, next) => {
+    let fetchedUser;
 
-    var products = req.session.user.cart.items.map(i => {
-        return {
-            quantity: i.quantity,
-            product: i.productId
-        };
-    })
+    User.findById(req.session.user._id)
+        .then(user => {
+            fetchedUser = user;
+            var products = user.cart.items.map(i => {
+                return {
+                    quantity: i.quantity,
+                    product: i.productId
+                };
+            });
 
-    Order.create({
-        products: products,
-        user: {
-            name: req.session.user.username,
-            id: req.session.user._id
-        }
-    })
-        .then(() => {
-            return User.findById(req.session.user._id);
-        })
-        .then(user => user.clearCart())
-        .then(() => {
-            res.redirect('/orders');
+            return Order.create({
+                products: products,
+                user: {
+                    name: req.session.user.username,
+                    id: req.session.user._id
+                }
+            })
+                .then(() => fetchedUser.clearCart())
+                .then(() => {
+                    res.redirect('/orders');
+                })
         })
         .catch(err => console.log(err));
 };
@@ -126,5 +133,39 @@ exports.getCheckout = (req, res, next) => {
         pageTitle: 'Checkout',
         path: 'checkout'
     });
+};
+
+exports.getInvoice = (req, res, next) => {
+    const orderId = req.params.orderId;
+    const filename = `invoice-${orderId}.pdf`;
+    const invoicePath = path('data', 'invoices', filename);
+
+    Order.findById(orderId)
+        .then(order => {
+            if (!order) {
+                return res.redirect('/404');
+            } else if (order && order.user.id.toString() === req.session.user._id.toString()) {
+                // Not good practice 
+                // fs.readFile(invoicePath, (err, data) => {
+                //     if (!data) {
+                //         res.redirect('/500');
+                //     } else {
+                //         res.setHeader('Content-Type', 'application/pdf');
+                //         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+                //         res.send(data);
+                //     }
+                // });
+                // streaming data on the fly instead of collect in the memory
+                const file = fs.createReadStream(invoicePath);
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+                file.pipe(res);
+
+            } else {
+                return res.redirect('/500');
+            }
+        })
+
+
 };
 

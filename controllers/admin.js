@@ -1,5 +1,6 @@
 const { ObjectId } = require('mongodb');
 const { validationResult } = require('express-validator/check');
+const file = require('../util/file');
 
 const Product = require('../models/mongodb/product');
 
@@ -45,25 +46,27 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postProduct = (req, res, next) => {
-    const { title, imageUrl, price, description } = req.body;
+    const { title, price, description } = req.body;
+    const image = req.file;
+    console.log(image);
     const product = new Product(
         {
             title: title,
             description: description,
             price: price,
-            imageUrl: imageUrl,
+            imageUrl: !image ? '' : image.path,
             userId: req.session.user
         }
     );
 
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    if (!image || !errors.isEmpty()) {
         return res.status(422).render('admin/products/add', {
             pageTitle: 'Add Product',
             path: 'add-product',
             hasError: true,
             product: product,
-            validationErrors: errors.array()
+            validationErrors: !image ? [{ msg: 'Attached file is not an image' }] : errors.array()
         });
     }
 
@@ -78,16 +81,21 @@ exports.postProduct = (req, res, next) => {
 };
 
 exports.putProduct = (req, res, next) => {
-    const { title, imageUrl, price, description } = req.body;
+    const { title, price, description } = req.body;
+    const image = req.file;
+    console.log(image);
     const productId = req.params.productId;
 
     Product.findOne({ _id: new ObjectId(productId), userId: req.session.user._id })
         .then(product => {
             if (product) {
-                product.title = title,
-                    product.description = description,
-                    product.price = price,
-                    product.imageUrl = imageUrl;
+                product.title = title;
+                product.description = description;
+                product.price = price;
+                if (image) {
+                    file.delete(product.imageUrl).then();
+                    product.imageUrl =  '/' + image.path.replace('\\', '/');
+                }
                 return product.save();
             }
         }
@@ -101,7 +109,7 @@ exports.deleteProduct = (req, res, next) => {
     Product.findOne({ _id: new ObjectId(productId), userId: req.session.user._id })
         .then(product => {
             if (product) {
-                product.remove();
+                return file.delete(product.imageUrl).then(() => product.remove());
             }
         })
         .then(() => {

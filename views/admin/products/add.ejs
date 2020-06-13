@@ -8,7 +8,7 @@
     <%if(hasError) {%>
     <div class="user-message user-message--error"><%=validationErrors[0].msg%></div>
     <%}%>
-    <form class="product-form" action="/admin/products" method="POST">
+    <form class="product-form" action="/admin/products" method="POST" enctype="multipart/form-data">
         <div class="form-control">
             <label for="title">Title</label>
             <input
@@ -16,9 +16,9 @@
                 type="text" 
                 name="title" 
                 id="title"
-                value="<%= hasError ? product.title: ''%>">
+                value="<%= hasError ? product.title : ''%>">
         </div>
-        <div class="form-control">
+        <!-- <div class="form-control">
             <label for="imageUrl">Image URL</label>
             <input 
                 class="<%= validationErrors.find(v => v.param === 'imageUrl') ? 'invalid': ''%>"      
@@ -26,6 +26,10 @@
                 name="imageUrl" 
                 id="imageUrl"
                 value="<%= hasError ? product.imageUrl: ''%>">
+        </div> -->
+        <div class="form-control">
+            <label for="image">Image</label>
+            <input type="file" name="image" id="image">
         </div>
         <div class="form-control">
             <label for="price">Price</label>
@@ -35,7 +39,7 @@
                 name="price"
                 id="price" 
                 step="0.01"
-                value="<%= hasError ? product.price: ''%>">
+                value="<%= hasError ? product.price : ''%>">
         </div>
         <div class="form-control">
             <label for="description">Description</label>
@@ -44,7 +48,7 @@
                 name="description" 
                 id="description" 
                 rows="5"
-                value="<%= hasError ? product.description: ''%>"></textarea>
+                value="<%= hasError ? product.description : ''%>"></textarea>
         </div>
         <input type="hidden" name="_csrf" value="<%=csrfToken%>"/>
     <button class="btn" type="submit">Add Product</button>
