@@ -48,7 +48,7 @@ exports.getEditProduct = (req, res, next) => {
 exports.postProduct = (req, res, next) => {
     const { title, price, description } = req.body;
     const image = req.file;
-    console.log(image);
+    
     const product = new Product(
         {
             title: title,

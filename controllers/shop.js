@@ -6,27 +6,57 @@ const Product = require('../models/mongodb/product');
 const Order = require('../models/mongodb/order');
 const User = require('../models/mongodb/user');
 
+const ITEMS_PER_PAGE = 10;
 
 exports.getProducts = (req, res, next) => {
-    Product.find()
+    const page = +req.query.page || 1;
+    let totalItems;
+
+    Product.countDocuments()
+        .then(numbers => {
+            totalItems = numbers;
+            return Product.find()
+                .skip((page - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE);
+        })
         .then(products => {
             res.render('shop/products/list', {
                 prods: products,
                 pageTitle: 'Shop products',
-                path: 'shop-products'
+                path: 'shop-products',
+                totalItems: totalItems,
+                hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+                hasPreviousPage: page > 1,
+                currentPage: page,
+                lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
             });
         });
 };
 
 exports.getIndex = (req, res, next) => {
-    Product.find()
+    const page = +req.query.page || 1;
+    let totalItems;
+
+    Product.countDocuments()
+        .then(numbers => {
+            totalItems = numbers;
+            return Product.find()
+                .skip((page - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE);
+        })
         .then(products => {
             res.render('shop/index', {
                 prods: products,
                 pageTitle: 'Shop',
-                path: 'shop'
+                path: 'shop',
+                totalItems: totalItems,
+                hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+                hasPreviousPage: page > 1,
+                currentPage: page,
+                lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
             });
         });
+
 };
 
 exports.getProduct = (req, res, next) => {
