@@ -5,6 +5,7 @@ const path = require('../util/path');
 const Product = require('../models/mongodb/product');
 const Order = require('../models/mongodb/order');
 const User = require('../models/mongodb/user');
+const stripe = require('stripe')('stripe private key');
 
 const ITEMS_PER_PAGE = 10;
 
@@ -159,10 +160,71 @@ exports.createOrder = (req, res, next) => {
 };
 
 exports.getCheckout = (req, res, next) => {
-    res.render('shop/checkout', {
-        pageTitle: 'Checkout',
-        path: 'checkout'
-    });
+    let items;
+    let totalSum;
+    User.findById(req.session.user._id)
+        .then(user => {
+            user
+                .populate('cart.items.productId')
+                .execPopulate()
+                .then(user => {
+                    items = user.cart.items;
+                    totalSum = user.cart.items.map(i => i.quantity * i.productId.price).reduce((a, b) => a + b, 0);
+
+                    return stripe.checkout.sessions.create({
+                        payment_method_types: ['card'],
+                        line_items: items.map(i => {
+                            return {
+                                name: i.productId.title,
+                                description: i.productId.description,
+                                amount: i.productId.price * 100,
+                                currency: 'usd',
+                                quantity: i.quantity
+                            }
+                        }),
+                        success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
+                        cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel'
+                    });
+                })
+                .then(session => {
+                    res.render('shop/checkout', {
+                        pageTitle: 'Checkout',
+                        path: 'checkout',
+                        items: items,
+                        totalSum: totalSum,
+                        sessionId: sessionId
+                    });
+                })
+        })
+        .catch(err => console.log(err));
+};
+
+exports.getCheckoutSuccess = (req, res, next) => {
+    let fetchedUser;
+
+    User.findById(req.session.user._id)
+        .then(user => {
+            fetchedUser = user;
+            var products = user.cart.items.map(i => {
+                return {
+                    quantity: i.quantity,
+                    product: i.productId
+                };
+            });
+
+            return Order.create({
+                products: products,
+                user: {
+                    name: req.session.user.username,
+                    id: req.session.user._id
+                }
+            })
+                .then(() => fetchedUser.clearCart())
+                .then(() => {
+                    res.redirect('/orders');
+                })
+        })
+        .catch(err => console.log(err));
 };
 
 exports.getInvoice = (req, res, next) => {

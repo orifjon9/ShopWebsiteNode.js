@@ -48,13 +48,13 @@ exports.getEditProduct = (req, res, next) => {
 exports.postProduct = (req, res, next) => {
     const { title, price, description } = req.body;
     const image = req.file;
-    
+
     const product = new Product(
         {
             title: title,
             description: description,
             price: price,
-            imageUrl: !image ? '' : image.path,
+            imageUrl: !image ? '' : ('/' + image.path.replace('\\', '/')),
             userId: req.session.user
         }
     );
@@ -94,7 +94,7 @@ exports.putProduct = (req, res, next) => {
                 product.price = price;
                 if (image) {
                     file.delete(product.imageUrl).then();
-                    product.imageUrl =  '/' + image.path.replace('\\', '/');
+                    product.imageUrl = '/' + image.path.replace('\\', '/');
                 }
                 return product.save();
             }
@@ -105,17 +105,31 @@ exports.putProduct = (req, res, next) => {
 };
 
 exports.deleteProduct = (req, res, next) => {
+    console.log('Delete product');
     const productId = req.params.productId;
-    Product.findOne({ _id: new ObjectId(productId), userId: req.session.user._id })
+    return Product.findOne({ _id: new ObjectId(productId) })
         .then(product => {
-            if (product) {
-                return file.delete(product.imageUrl).then(() => product.remove());
+            console.log(product);
+            if(!product){
+                return res.status(404).json({ "message": "Product was not found."});
+            }
+            else if(product.userId.toString() !== req.session.user._id.toString())
+            {
+                return res.status(403).json({ "message": "You are unable to remove this product"});
+            }
+            else {
+                return file.delete(product.imageUrl.substring(1).replace('/', '\\')).then(() => product.remove());
             }
         })
         .then(() => {
-            res.redirect(`/admin/products`);
+            return res.status(200).json({ "message": "Success" });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+           return res.status(200).json({
+                "message": "Deleting product failed",
+                "error": err
+            });
+        });
 };
 
 const redirectToPageNotFound = (res) => res.redirect('/404');
