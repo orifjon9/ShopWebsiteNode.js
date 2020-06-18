@@ -5,3 +5,4 @@ credentials.txt
 images/*
 
 .env
+package-lock.json
