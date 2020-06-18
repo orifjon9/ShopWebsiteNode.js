@@ -4,16 +4,14 @@ const session = require('express-session');
 //const MongoDBClient = mongoDB.MongoClient;
 const mongoDBStoreSession = require('connect-mongodb-session')(session);
 
-const MONGODB_URI = 'mongodb+srv://shop-user:l2aFPmYxLhEjvAFU@cluster-shop-jwc7t.mongodb.net/shop-dev';
-
 let _db;
 
-const sessionStore = new mongoDBStoreSession({
+const sessionStore = (MONGODB_URI) => new mongoDBStoreSession({
     uri: MONGODB_URI,
     collection: 'sessions'
 });
 
-const mongoDBConnect = () => {
+const mongoDBConnect = (MONGODB_URI) => {
     return new Promise((resolve, reject) => {
         mongoose.connect(MONGODB_URI)
             .then(res => resolve(res))

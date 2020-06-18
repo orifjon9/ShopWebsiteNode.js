@@ -6,6 +6,9 @@ const session = require('express-session');
 const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const path = require('./util/path');
 const errorController = require('./controllers/error');
@@ -55,7 +58,7 @@ app.use(session({
     secret: 'my secret',
     resave: false,
     saveUninitialized: false,
-    store: sessionStore
+    store: sessionStore(process.env.MONGODB_URI)
 }));
 
 app.use(csrfProtection);
@@ -93,10 +96,10 @@ app.use((req, res, next) => {
 //     })
 //     .catch(err => console.log(err));
 
-mongoDBConnect()
+mongoDBConnect(process.env.MONGODB_URI)
     .then(() => {
-        app.listen(3000, () => {
-            console.log('http://localhost:3000 started');
+        app.listen(process.env.PORT, () => {
+            console.log(`http://localhost:${process.env.PORT} started`);
         });
     })
     .catch(err => console.log(err));
