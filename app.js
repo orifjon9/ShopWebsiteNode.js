@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 const multer = require('multer');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
+const compression = require('compression');
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ const fileFilter = (req, file, callback) => {
 
 //Setting Secure Response Headers
 app.use(helmet());
+app.use(compression());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
