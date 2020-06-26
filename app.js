@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const expressHbs = require('express-handlebars');
 const methodOverride = require('method-override');
@@ -9,6 +10,7 @@ const multer = require('multer');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
 const compression = require('compression');
+const morgan = require('morgan');
 
 dotenv.config();
 
@@ -52,9 +54,16 @@ const fileFilter = (req, file, callback) => {
     }
 };
 
-//Setting Secure Response Headers
+const accessLogStream = fs.createWriteStream(
+    path('access.log'),
+    { flags: 'a' }
+)
+
+// Deploying App
 app.use(helmet());
 app.use(compression());
+app.use(morgan('combined', { stream: accessLogStream }));
+///
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
