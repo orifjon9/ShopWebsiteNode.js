@@ -7,6 +7,7 @@ const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
 
 dotenv.config();
 
@@ -49,6 +50,9 @@ const fileFilter = (req, file, callback) => {
         callback(null, false);
     }
 };
+
+//Setting Secure Response Headers
+app.use(helmet());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
